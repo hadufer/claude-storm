@@ -1,37 +1,64 @@
-# STORM : recherche approfondie en 1 prompt pour Claude Code
+<h1 align="center">STORM for Claude Code</h1>
 
-Plugin Claude Code qui reproduit la méthode de recherche STORM du Stanford OVAL Lab (NAACL 2024) en une seule commande. Il y ajoute l'adaptation en 4 prompts publiée par Nav Toor (@heynavtoor).
+<p align="center">
+  <em>Type one command. Get a cited, multi-perspective research report.</em>
+</p>
 
-Au lieu de copier-coller quatre prompts l'un après l'autre, vous tapez `/storm:storm <sujet>`. Claude mène alors une recherche multi-perspectives ancrée dans de vraies sources web, puis rédige un rapport cité.
+<p align="center">
+  <img src="assets/storm-architecture.png" width="760" alt="STORM and Co-STORM architecture: per-perspective Wikipedia-writer and expert conversations grounded in web search, producing a cited report">
+</p>
 
-Inspiré de [stanford-oval/storm](https://github.com/stanford-oval/storm) (licence MIT).
+<p align="center">
+  <sub>Architecture figure from the Stanford OVAL STORM project. This plugin reproduces the top (STORM) loop as a Claude Code prompt pipeline.</sub>
+</p>
 
-## Ce que fait le plugin
+<p align="center">
+  <a href="https://github.com/hadufer/claude-storm/releases"><img src="https://img.shields.io/github/v/release/hadufer/claude-storm?style=flat-square&color=111111" alt="Release"></a>
+  <a href="https://github.com/hadufer/claude-storm/stargazers"><img src="https://img.shields.io/github/stars/hadufer/claude-storm?style=flat-square&color=111111" alt="Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="License"></a>
+  <a href="https://storm.genie.stanford.edu/"><img src="https://img.shields.io/badge/live%20demo-storm.genie.stanford.edu-111111?style=flat-square" alt="Official STORM live demo"></a>
+</p>
 
-`/storm:storm` exécute le pipeline STORM, étape par étape.
+Stanford built a research system called STORM. It writes Wikipedia-style, cited articles by interviewing a topic from several perspectives. You can try the official version at [storm.genie.stanford.edu](https://storm.genie.stanford.edu/).
 
-1. Découverte de perspectives. Cinq angles (praticien, académique, sceptique, économiste, historien) plus le « rédacteur de faits de base » de STORM, adaptés au sujet.
-2. Interviews ancrées en parallèle. Un sous-agent `storm-researcher` par perspective mène une interview entre un rédacteur et un expert sur trois tours, fondée sur de vraies recherches web. Chaque affirmation est citée.
-3. Carte des contradictions. Les points où les perspectives s'opposent, ce sur quoi elles s'accordent toutes (donc probablement vrai), et l'angle mort que personne n'aborde.
-4. Plan hiérarchique, d'abord esquissé puis affiné avec les trouvailles des interviews.
-5. Article cité de type Wikipédia, rédigé section par section (sous-agents `storm-writer` en parallèle). Les citations `[n]` sont globalisées et dédupliquées par URL.
-6. Briefing de synthèse. Un résumé pour décideur en 60 secondes, cinq conclusions classées par fiabilité, une connexion non évidente, une action concrète, et la question ouverte qui changerait la donne.
-7. Auto-relecture critique. Scores de confiance de 1 à 10, maillon le plus faible, vérification des biais, perspective manquante, note finale. C'est ce qui corrige la faiblesse connue de STORM : le système ne se critique pas lui-même.
+This plugin runs the same idea inside Claude Code. One command, no GitHub clone, no API keys. It discovers perspectives, interviews each one against real web sources, maps where they disagree, writes a cited report, and grades its own work.
 
-Le rapport est enregistré dans `storm-<sujet>.md`, avec une section References cliquable.
+## Before and after
 
-## Les deux commandes
+Without it, you ask once and get the majority view with no sources. Or you paste four separate prompts and keep track of the thread yourself.
 
-| Commande | Web | Sous-agents | Sortie |
-|----------|:---:|:-----------:|--------|
-| `/storm:storm` | oui | oui, en parallèle | Rapport complet cité, briefing et relecture critique, enregistré sur disque |
-| `/storm:storm-brief` | non | non | Briefing rapide en 4 phases, non sourcé, affiché dans le chat |
+With it, you type one command and get a sourced, multi-perspective report saved to a file:
 
-`/storm:storm-brief` reprend la méthode exacte du tweet de Nav Toor en une seule passe, sans appel web. Pratique quand vous voulez le briefing de cinq minutes sans attendre la recherche.
+```bash
+/storm:storm the impact of generative AI on education
+```
 
-## Installation
+## How it works
 
-### Depuis GitHub (recommandé pour partager)
+`/storm:storm` runs the STORM pipeline step by step.
+
+1. Perspective discovery. Five lenses (practitioner, academic, skeptic, economist, historian) plus STORM's "basic fact writer", adapted to the topic.
+2. Grounded interviews in parallel. One `storm-researcher` subagent per perspective runs a writer-and-expert interview over three rounds, backed by real web search. Every claim is cited.
+3. Contradiction map. Where the perspectives clash, what they all agree on (so probably true), and the blind spot none of them covered.
+4. Outline. Drafted first, then refined with what the interviews found.
+5. Cited article. Written section by section (`storm-writer` subagents in parallel), with `[n]` citations globalized and de-duplicated by URL.
+6. Synthesis briefing. A 60-second summary for a decision maker, five findings ranked by reliability, a non-obvious connection, a concrete action, and the open question that would change the picture.
+7. Self peer-review. Confidence scores from 1 to 10, the weakest claim, a bias check, a missing perspective, and a final grade. This is the fix for STORM's known weakness: the system does not critique itself.
+
+The report is saved to `storm-<topic>.md` with a clickable References section.
+
+## Commands
+
+| Command | Web | Subagents | Output |
+|---------|:---:|:---------:|--------|
+| `/storm:storm` | yes | yes, in parallel | Full cited report, briefing and peer-review, saved to disk |
+| `/storm:storm-brief` | no | no | Fast four-phase briefing, not sourced, shown in chat |
+
+`/storm:storm-brief` runs Nav Toor's four-prompt method in a single pass with no web calls. Use it when you want the five-minute briefing without waiting on research.
+
+## Install
+
+### Claude Code, from GitHub
 
 ```bash
 /plugin marketplace add hadufer/claude-storm
@@ -39,79 +66,95 @@ Le rapport est enregistré dans `storm-<sujet>.md`, avec une section References 
 /reload-plugins
 ```
 
-### Depuis un dossier local
+### Claude Code, from a local folder
 
 ```bash
-/plugin marketplace add C:/chemin/vers/claude-storm
+/plugin marketplace add /path/to/claude-storm
 /plugin install storm@storm-marketplace
 /reload-plugins
 ```
 
-### Test le temps d'une session, sans installer
+### Try it for one session, without installing
 
 ```bash
-claude --plugin-dir C:/chemin/vers/claude-storm
+claude --plugin-dir /path/to/claude-storm
 ```
 
-Pour valider le plugin avant publication :
+Validate the plugin before publishing:
 
 ```bash
 claude plugin validate .
 ```
 
-## Utilisation
+## Usage
 
 ```bash
-# Recherche complète, ancrée et citée
-/storm:storm l'impact de l'IA générative sur l'éducation
+# Full grounded, cited research
+/storm:storm the impact of generative AI on education
 
-# Réglages optionnels
-/storm:storm voitures électriques --depth deep --lang fr
+# Optional flags
+/storm:storm electric vehicles --depth deep --lang en
 /storm:storm quantum computing --depth quick
 
-# Briefing rapide en une passe, sans web
-/storm:storm-brief stratégie de pricing SaaS --role fondateur
+# Fast one-pass briefing, no web
+/storm:storm-brief SaaS pricing strategy --role founder
 ```
 
-### Arguments
+### Flags
 
-- `--depth quick | standard | deep` : profondeur de la recherche. Par défaut `standard`, soit cinq perspectives plus le rédacteur de base et trois tours d'interview.
-- `--lang <code>` : langue du livrable. Par défaut, la langue de votre requête.
-- `--no-web` : ignore la recherche web. À éviter ; pour ce besoin, préférez `storm-brief`.
-- `--role <rôle>` (mode brief) : votre rôle, utilisé pour calibrer l'action concrète.
+- `--depth quick | standard | deep`: research depth. Default is `standard`, meaning five perspectives plus the basic writer and three interview rounds.
+- `--lang <code>`: language of the deliverable. Default is the language of your query.
+- `--no-web`: skip web search. Avoid this; use `storm-brief` instead.
+- `--role <role>` (brief mode): your role, used to tailor the concrete action.
 
-Les commandes d'un plugin portent toujours le préfixe du plugin, ici `storm`. D'où `/storm:storm` et `/storm:storm-brief`.
+Plugin commands always carry the plugin prefix, here `storm`. That is why you type `/storm:storm` and `/storm:storm-brief`.
 
-## Coût et performance
+## Cost and performance
 
-`/storm:storm` est volontairement lourd. Il lance plusieurs sous-agents et de nombreuses recherches web pour atteindre une qualité proche de 40 à 60 heures de travail humain. Pour une réponse en quelques secondes sans appel web, utilisez `/storm:storm-brief`.
+`/storm:storm` is heavy on purpose. It runs several subagents and many web searches to reach a quality that takes a person 40 to 60 hours by hand. For an answer in seconds with no web calls, use `/storm:storm-brief`.
 
-Conseil : lancez la commande complète sous Opus pour la qualité de synthèse. Les sous-agents `storm-researcher` tournent sous Sonnet par défaut, pour la vitesse et le parallélisme. STORM procède de la même façon, avec un modèle léger pour les conversations et un modèle plus fort pour la rédaction.
+Run the full command on Opus for synthesis quality. The `storm-researcher` subagents default to Sonnet for speed and parallelism. STORM does the same: a light model for the conversations, a stronger one for the writing.
 
-## Structure du plugin
+## Plugin structure
 
 ```
 claude-storm/
 ├── .claude-plugin/
-│   ├── plugin.json          # manifeste (nom : "storm")
-│   └── marketplace.json     # catalogue de distribution
+│   ├── plugin.json          # manifest (name: "storm")
+│   └── marketplace.json     # distribution catalog
 ├── skills/
 │   ├── storm/
-│   │   ├── SKILL.md         # /storm:storm, l'orchestrateur complet
-│   │   └── reference.md     # prompts STORM, conventions, gabarit du rapport
+│   │   ├── SKILL.md         # /storm:storm, the full orchestrator
+│   │   └── reference.md     # STORM prompts, conventions, report template
 │   └── storm-brief/
-│       └── SKILL.md         # /storm:storm-brief, la méthode 4 prompts
+│       └── SKILL.md         # /storm:storm-brief, the four-prompt method
 ├── agents/
-│   ├── storm-researcher.md  # interviewer ancré, guidé par perspective
-│   └── storm-writer.md      # rédacteur de section cité
+│   ├── storm-researcher.md  # grounded, perspective-guided interviewer
+│   └── storm-writer.md      # cited section writer
+├── assets/
+│   └── storm-architecture.png
 ├── README.md
 └── LICENSE
 ```
 
-## Crédits
+## FAQ
 
-STORM vient de Shao et al., « Assisting in Writing Wikipedia-like Articles From Scratch with Large Language Models », NAACL 2024 ([arXiv:2402.14207](https://arxiv.org/abs/2402.14207)), code sur [stanford-oval/storm](https://github.com/stanford-oval/storm) (licence MIT). Démo en ligne : [storm.genie.stanford.edu](https://storm.genie.stanford.edu).
+**Do I need the STORM repo or any API keys?**
+No. It runs entirely inside Claude Code, using the built-in web search and subagents.
 
-L'adaptation en 4 prompts vient de Nav Toor ([@heynavtoor](https://x.com/heynavtoor/status/2067194761446920264)).
+**How is this different from the official STORM?**
+The official tool runs as Python with its own retrieval backends. This plugin reproduces the method as a prompt pipeline so it works from one Claude Code command. For the original, see [storm.genie.stanford.edu](https://storm.genie.stanford.edu/) and [stanford-oval/storm](https://github.com/stanford-oval/storm).
 
-Projet indépendant, sans lien avec l'Université de Stanford. Licence MIT.
+**Is it affiliated with Stanford?**
+No. This is an independent project. The method and the architecture figure are credited to the Stanford OVAL Lab.
+
+**Why are the commands prefixed with `storm:`?**
+Claude Code namespaces every plugin command by the plugin name.
+
+## Credits
+
+STORM is by Shao et al., "Assisting in Writing Wikipedia-like Articles From Scratch with Large Language Models", NAACL 2024 ([arXiv:2402.14207](https://arxiv.org/abs/2402.14207)). Code: [stanford-oval/storm](https://github.com/stanford-oval/storm) (MIT). Official live demo: [storm.genie.stanford.edu](https://storm.genie.stanford.edu/).
+
+The four-prompt adaptation is by Nav Toor ([@heynavtoor](https://x.com/heynavtoor/status/2067194761446920264)).
+
+Independent project, not affiliated with Stanford University. MIT License.
