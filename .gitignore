@@ -1,0 +1,15 @@
+# Claude Code / session cruft
+.impeccable/
+.claude/
+*.log
+
+# STORM run outputs (generated reports) — anchored to repo root so the
+# agents/storm-*.md plugin files are NOT ignored
+/storm-*.md
+/storm-brief-*.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

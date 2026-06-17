@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "storm",
+  "displayName": "STORM Deep Research",
+  "version": "1.0.0",
+  "description": "Run Stanford STORM-style PhD-grade research in a single prompt: multi-perspective grounded web interviews, contradiction mapping, a fully cited Wikipedia-style report, synthesis briefing and self peer-review.",
+  "author": {
+    "name": "Hassan Dufer",
+    "email": "dufer.hassan@gmail.com"
+  },
+  "homepage": "https://github.com/hadufer/claude-storm",
+  "repository": "https://github.com/hadufer/claude-storm",
+  "license": "MIT",
+  "keywords": [
+    "storm",
+    "deep-research",
+    "research",
+    "stanford",
+    "multi-perspective",
+    "knowledge-curation",
+    "citations",
+    "wikipedia",
+    "rag",
+    "report"
+  ]
+}
