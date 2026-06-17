@@ -3,10 +3,13 @@
 .claude/
 *.log
 
-# STORM run outputs (generated reports) — anchored to repo root so the
+# STORM run outputs (generated reports), anchored to repo root so the
 # agents/storm-*.md plugin files are NOT ignored
 /storm-*.md
 /storm-brief-*.md
+
+# Marketing assets (kept local, not published)
+marketing/
 
 # OS / editor
 .DS_Store
